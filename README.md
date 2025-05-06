@@ -19,7 +19,7 @@ Pressing it will open up the Playable Loader Menu, where you can enable/disable 
 # Can I make my own playables?
 Yes, you can use the HereComesHueh folder (`playables/HereComesHueh`) as a reference on how to structure your own folder.
 
-The mod will also create a new folder (`originalFiles`) where the normal Niko assets are stored, so you can use them to create your own.
+The mod will create a new folder (`originalFiles`) where the normal Niko assets are stored, so you can use them to create your own.
 
 Your final folder should look like this:
 ```swift
