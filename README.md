@@ -32,7 +32,7 @@ BepInEx/
 │       │       └── icon.png
 │       │       └── info.ini
 ```
-- assets folder conatins all the pngs.
+- the assets folder contains all the pngs.
 
 - `icon.png` is the icon of your playable, which will be used in the menu.
 
