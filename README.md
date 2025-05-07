@@ -15,6 +15,8 @@ When loaded in, open the menu and in the bottom left there should be a new icon.
 Pressing it will open up the Playable Loader Menu, where you can enable/disable the mod and change your playable
 ![image](https://github.com/user-attachments/assets/a1116b6a-c0b3-4ffe-a446-bb11fa5e1f14)
 
+## Where can I get playables?
+You can find them at the [HCN! Nexus Page](https://www.nexusmods.com/games/herecomesniko)
 
 # Can I make my own playables?
 Yes, you can use the HereComesHueh folder (`playables/HereComesHueh`) as a reference on how to structure your own folder.
