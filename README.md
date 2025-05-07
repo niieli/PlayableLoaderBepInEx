@@ -6,6 +6,19 @@
 
 I ported the mod to BepInEx so it can be used with the [Here Comes Niko! Randomizer](https://www.nexusmods.com/herecomesniko/mods/2?tab=description).
 
+## Installation
+1. Download and install [BepInEx 5.4.x](https://github.com/BepInEx/BepInEx/releases/tag/v5.4.22) in your Here Comes Niko root folder (where Here Comes Niko!.exe is located).
+2. Start the game once so that BepInEx creates its stuff
+3. Download the zip from the [latest release](https://github.com/niieli/PlayableLoaderBepInEx/releases/latest) and extract its content into `BepInEx/plugins`
+4. If done correctly it should look like this
+```swift
+BepInEx/
+├── plugins/
+│   ├── PlayableLoaderBepInEx.dll
+│   ├── playables/
+│   └── data/
+```
+
 ## How to use??
 When loaded in, open the menu and in the bottom left there should be a new icon. 
 
