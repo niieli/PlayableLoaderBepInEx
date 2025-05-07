@@ -4,7 +4,7 @@
 
 ## Why another version?
 
-I ported the mod to BepInEx so it can be used with the [Here Comes Niko! Randomizer](https://www.nexusmods.com/herecomesniko/mods/2?tab=description).
+I ported the mod to BepInEx so it can be used with the [Here Comes Niko! Randomizer](https://github.com/niieli/NikoArchipelagoMod?tab=readme-ov-file#installation).
 
 ## Installation
 1. Download and install [BepInEx 5.4.x](https://github.com/BepInEx/BepInEx/releases/tag/v5.4.22) in your Here Comes Niko root folder (where Here Comes Niko!.exe is located).
