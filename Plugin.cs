@@ -71,6 +71,7 @@ namespace PlayableLoaderBepInEx
 			SceneManager.sceneLoaded += OnSceneLoaded;
 			_harmony = new Harmony(PluginGuid);
 			_harmony.PatchAll();
+			//InvokeRepeating(nameof(SaveToFiles), 10f, 10f);
 		}
 
 		private void Start()
@@ -166,6 +167,7 @@ namespace PlayableLoaderBepInEx
 		{
 			return () => {
 				BepinLogger.LogInfo("CLICKED: " + r.Name);
+				if (CurrentResource == r || !IsEnabled) return;
 				CurrentResource = r;
 				Replaced = false;
 			};
@@ -246,6 +248,7 @@ namespace PlayableLoaderBepInEx
 			bool flag = !value;
 			if (flag)
 			{
+				if (CurrentResource.IsDefault) return;
 				Replaced = false;
 				PlayerAnimations[] o = FindObjectsOfType<PlayerAnimations>();
 				foreach (PlayerAnimations x in o)
@@ -261,7 +264,7 @@ namespace PlayableLoaderBepInEx
 			}
 		}
 
-		internal static object GetInstanceField(Type type, object instance, string fieldName)
+		private static object GetInstanceField(Type type, object instance, string fieldName)
 		{
 			BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 			FieldInfo field = type.GetField(fieldName, bindFlags);
@@ -271,7 +274,7 @@ namespace PlayableLoaderBepInEx
 		private static void AssetReplace(string context, SpriteBank sb, bool reset)
 		{
 			LogBatch.Clear();
-			bool flag = sb == null || sb.name == null;
+			bool flag = sb == null;
 			if (!flag)
 			{
 				string root = Path.Combine(Paths.PluginPath, "playables", CurrentResource.FolderName, context);
@@ -279,9 +282,9 @@ namespace PlayableLoaderBepInEx
 				string assetName = sb.name.Split('|')[0];
 				for (int i = 0; i < sb.Texture.depth; i++)
 				{
-					LogBatch.AppendLine(string.Format("Asset => {0}_{1}", assetName, i));
-					string file = Path.Combine(root, string.Format("{0}_{1}.png", assetName, i));
-					string file2 = Path.Combine(rootD, string.Format("{0}_{1}.png", assetName, i));
+					LogBatch.AppendLine($"Asset => {assetName}_{i}");
+					string file = Path.Combine(root, $"{assetName}_{i}.png");
+					string file2 = Path.Combine(rootD, $"{assetName}_{i}.png");
 					bool flag2 = !File.Exists(file2);
 					if (flag2)
 					{
@@ -322,31 +325,26 @@ namespace PlayableLoaderBepInEx
 			BepinLogger.LogInfo(LogBatch);
 			LogBatch.Clear();
 		}
+
+		private void SaveToFiles()
+		{
+			File.WriteAllText(SaveFilePath, IsEnabled.ToString());
+			File.WriteAllText(FlagFilePath, CurrentResource.FolderName);
+			Logger.LogInfo("Autosaved PlayableLoader settings.");
+		}
 		
 		public class ResourceModel : IDisposable
 		{
 			public string Name
 			{
-				get
-				{
-					return _Name ?? FolderName;
-				}
-				set
-				{
-					_Name = value;
-				}
+				get => _Name ?? FolderName;
+				set => _Name = value;
 			}
 			
 			public string Author
 			{
-				get
-				{
-					return _Author ?? "unknown";
-				}
-				set
-				{
-					_Author = value;
-				}
+				get => _Author ?? "unknown";
+				set => _Author = value;
 			}
 			
 			public Texture Icon { get; set; }
@@ -381,9 +379,9 @@ namespace PlayableLoaderBepInEx
 						string p2 = x[1].Trim();
 						string text = p;
 						string text2 = text;
-						if (!(text2 == "name"))
+						if (text2 != "name")
 						{
-							if (!(text2 == "author"))
+							if (text2 != "author")
 							{
 								if (text2 == "icon")
 								{

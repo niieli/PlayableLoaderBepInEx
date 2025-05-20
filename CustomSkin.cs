@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -16,8 +17,11 @@ public class CustomSkin : MonoBehaviour
     public static GameObject customSkinPanel, tempButton;
     private static TextMeshProUGUI currentPlayable, currentPlayableShadow;
     private static TextMeshProUGUI currentSelectedText, currentSelectedTextShadow;
+    private static TextMeshProUGUI currentPlayableTitle, currentPlayableTitleShadow;
     private static Toggle enableToggle;
-    private static List<GameObject> buttons = new();
+    private static readonly List<GameObject> Buttons = new();
+    private GridLayoutGroup layoutGroup;
+    private int previousButtonCount = -1;
     void Start()
     {
         tempButton = transform.Find("TempButton").gameObject;
@@ -34,53 +38,70 @@ public class CustomSkin : MonoBehaviour
         customSkinButton.onClick.AddListener(TogglePanel);
         refreshButton.onClick.AddListener(OnRefresh);
         folderButton.onClick.AddListener(OpenFolder);
+        currentPlayableTitle = customSkinPanel.transform.Find("CurrentPlayable").GetComponent<TextMeshProUGUI>();
+        currentPlayableTitleShadow = customSkinPanel.transform.Find("CurrentPlayableShadow").GetComponent<TextMeshProUGUI>();
+        layoutGroup = customSkinPanel.GetComponent<GridLayoutGroup>();
+        UpdateLayout();
     }
 
     void Update()
     {
         if (!enableToggle.isOn)
         {
-            var textShadow = buttons[0].transform.Find("PlayableNameShadow").GetComponent<TextMeshProUGUI>();
-            var textNormal = buttons[0].transform.Find("PlayableName").GetComponent<TextMeshProUGUI>();
+            var textShadow = Buttons[0].transform.Find("PlayableNameShadow").GetComponent<TextMeshProUGUI>();
+            var textNormal = Buttons[0].transform.Find("PlayableName").GetComponent<TextMeshProUGUI>();
             currentSelectedTextShadow.color = new Color(0.42f, 0.09f,0.584f);
             currentSelectedText.color = Color.white;
             currentSelectedTextShadow = textShadow;
             currentSelectedText = textNormal;
-            currentSelectedTextShadow.color = new Color(0f, 0.28f,0.28f);
-            currentSelectedText.color = new Color(0.41f, 0.915f,0.41f);
-        }
-        if (GetButtonCount() < 6)
+            currentSelectedTextShadow.color = new Color(0f, 0.28f, 0.28f);
+            currentSelectedText.color = new Color(0.41f, 0.915f, 0.41f);
+            if (currentPlayableTitle.text == "Current playable:")
+            {
+                currentPlayableTitleShadow.text = "Current playable (Disabled):";
+                currentPlayableTitle.text = "Current playable (Disabled):";
+            }
+        } 
+        else if (currentPlayableTitle.text == "Current playable (Disabled):")
         {
-            customSkinPanel.gameObject.GetComponent<GridLayoutGroup>().cellSize = new Vector2(500f, 500f);
+            currentPlayableTitleShadow.text = "Current playable:";
+            currentPlayableTitle.text = "Current playable:";
         }
-        if (GetButtonCount() > 6 && GetButtonCount() < 10)
+        UpdateLayout();
+    }
+
+    void UpdateLayout()
+    {
+        int count = GetButtonCount();
+        if (count == previousButtonCount) return;
+        previousButtonCount = count;
+
+        if (count < 6)
         {
-            customSkinPanel.gameObject.GetComponent<GridLayoutGroup>().cellSize = new Vector2(350f, 350f);
+            layoutGroup.cellSize = new Vector2(500f, 500f);
         }
-        if (GetButtonCount() > 10 && GetButtonCount() < 18)
+        else if (count < 10)
         {
-            customSkinPanel.gameObject.GetComponent<GridLayoutGroup>().cellSize = new Vector2(275f, 275f);
+            layoutGroup.cellSize = new Vector2(350f, 350f);
         }
-        if(GetButtonCount() > 18 && GetButtonCount() < 27)
+        else if (count < 18)
         {
-            customSkinPanel.gameObject.GetComponent<GridLayoutGroup>().spacing = new Vector2(-80f, -80f);
+            layoutGroup.cellSize = new Vector2(275f, 275f);
         }
-        if(GetButtonCount() > 27)
-        {
-            customSkinPanel.gameObject.GetComponent<GridLayoutGroup>().padding.left = 86;
-        }
+
+        layoutGroup.spacing = count is > 18 and < 27 ? new Vector2(-80f, -80f) : Vector2.zero;
+        layoutGroup.padding.left = count > 27 ? 86 : 0;
     }
 
     private int GetButtonCount()
     {
-        var buttons = FindObjectsOfType<Button>();
-        return buttons.Count(t => t.name.StartsWith("Temp") && t.name.EndsWith("(Clone)"));
+        return FindObjectsOfType<Button>().Count(t => t.name.StartsWith("Temp") && t.name.EndsWith("(Clone)"));
     }
     
     public static Button AddButton(Texture icon,string name, string author, string folderName)
     {
         var addedButton = Instantiate(tempButton.gameObject, customSkinPanel.transform);
-        buttons.Add(addedButton);
+        Buttons.Add(addedButton);
         addedButton.GetComponent<RawImage>().texture = icon;
         var textShadow = addedButton.transform.Find("PlayableNameShadow").GetComponent<TextMeshProUGUI>();
         textShadow.text = $"{name}\n(by {author})";
@@ -99,7 +120,8 @@ public class CustomSkin : MonoBehaviour
 
     public static void DestroyButtons()
     {
-        buttons.ForEach(Destroy);
+        Buttons.ForEach(Destroy);
+        Buttons.Clear();
     }
 
     private static UnityAction ActiveText(GameObject gameObject, string folderName)
